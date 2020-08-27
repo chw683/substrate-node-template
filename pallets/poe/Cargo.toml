@@ -1,0 +1,75 @@
+[package]
+authors = ['Substrate DevHub <https://github.com/substrate-developer-hub>']
+description = 'FRAME pallet template for proof of existence'
+edition = '2018'
+homepage = 'https://substrate.dev'
+license = 'Unlicense'
+name = 'pallet-poe'
+repository = 'https://github.com/substrate-developer-hub/substrate-node-template/'
+version = '2.0.0-rc5'
+
+# 指定生成文档的适用平台(即不再为其它平台编译相应文档[减少文档磁盘占用容量])
+[package.metadata.docs.rs]
+targets = ['x86_64-unknown-linux-gnu']
+
+# 提供编解码工具包
+# [dependencies] : 标注线上环境所需依赖
+[dependencies.codec]
+default-features = false
+features = ['derive']
+package = 'parity-scale-codec'
+version = '1.3.1'
+
+# 提供 Runtime 使用到的宏(如" decl_xxx ")及类型(如" map、doublemap ")
+[dependencies.frame-support]
+default-features = false
+git = 'https://github.com/paritytech/substrate.git'
+tag = 'v2.0.0-rc5'
+version = '2.0.0-rc5'
+
+# 所有 Runtime 模块所依赖的基础模块(提供核心类型及基本功能组件)
+[dependencies.frame-system]
+default-features = false
+git = 'https://github.com/paritytech/substrate.git'
+tag = 'v2.0.0-rc5'
+version = '2.0.0-rc5'
+
+# 使用" std::prelude::* "需追加依赖并加入 feature 编译标签
+[dependencies.sp-std]
+default-features = false
+git = 'https://github.com/paritytech/substrate.git'
+tag = 'v2.0.0-rc5'
+version = '2.0.0-rc5'
+
+# 提供共享的基础类型
+# [dev-dependencies ] : 标注测试依赖
+[dev-dependencies.sp-core]
+default-features = false
+git = 'https://github.com/paritytech/substrate.git'
+tag = 'v2.0.0-rc5'
+version = '2.0.0-rc5'
+
+# 提供读写所需的接口及功能
+[dev-dependencies.sp-io]
+default-features = false
+git = 'https://github.com/paritytech/substrate.git'
+tag = 'v2.0.0-rc5'
+version = '2.0.0-rc5'
+
+# 提供通用 Runtime 模块会用到的类型
+[dev-dependencies.sp-runtime]
+default-features = false
+git = 'https://github.com/paritytech/substrate.git'
+tag = 'v2.0.0-rc5'
+version = '2.0.0-rc5'
+
+# features 做条件编译(默认 std 模式)
+[features]
+default = ['std']
+std = [
+    'codec/std',
+    'frame-support/std',
+    'frame-system/std',
+    #加入 feature 编译标签
+    'sp-std/std'
+]
