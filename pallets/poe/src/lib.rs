@@ -114,37 +114,38 @@ decl_module! {
         pub fn transfer_claim(
                 origin,
                 proof: Vec<u8>,
+                // 亦可直接定义为" receiver:T::AccountId "
                 receiver:<T as frame_system::Trait>::AccountId
             )
             -> dispatch::DispatchResult
             {
                 // 校验并获取交易用户即 AccountId
                 let sender = ensure_signed(origin)?;
-                /*  //因传入的是目标账户地址故不可校验
+                /*  //因传入的是目标账户地址故不可使用同于 origin 的方式校验
                     let receiver = ensure_signed(receiver)?;
                  */
                 // 确保存证存在
                 ensure!(Proofs::<T>::contains_key(&proof),Error::<T>::ProofNotExist);
-                // 获取当前 proof 对应的 owner (应用人)
+                // 获取当前 proof 对应的 owner (所有权人)
                 let (owner,block_number) = Proofs::<T>::get(&proof);
                 // 校验发送方是否为 owner
                 ensure!(owner == sender, Error::<T>::NotClaimOwner);
 
-                /* (转移存证)实现方式 1 ：删除后重新使用 receiver 账户存储
+                /* (转移存证)实现方式 1 ：删除后重新使用 receiver 账户存证
                       (虽能实现功能但不推荐此操作[因删除再存储消耗资源])
                    再者：" receiver.clone() "推荐使用" &receiver "替代
                  */
                  /*
-                     // 删除存证、换值重新创建存储:
+                     // 删除存证、更换 value 重新创建存证:
                      Proofs::<T>::remove(&proof);
                      Proofs::<T>::insert(&proof,(receiver.clone(),block_number));
                  */
 
                 // (转移存证)实现方式 2 ：更换 value 插入(覆盖实现)
-                Proofs::<T>::insert(&proof,(&receiver,block_number));
+                //Proofs::<T>::insert(&proof,(&receiver,block_number));
 
-                // TODO 待实现... (转移存证)实现方式 3 ：使用闭包(直接修改[推荐此种实现方式])
-                //Proofs::<T>::mutate(&proof,|(sender,block_number)|(&receiver));
+                // (转移存证)实现方式 3 ：使用闭包(直接修改[推荐此种实现方式])
+                Proofs::<T>::mutate(&proof, |v| *v = (receiver.clone(), v.1));
 
                 // 触发事件
                 Self::deposit_event(RawEvent::ClaimTransfer(sender,proof,receiver));
